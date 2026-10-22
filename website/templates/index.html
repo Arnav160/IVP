@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Camouflaged Object Segmentation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Camouflaged Object Segmentation</h1>
+        <p class="hero-subtitle">
+            Using U-Net with ResNet34 encoder to detect camouflaged objects across multiple datasets.
+            Best performing configuration: <strong>RGB + Depth</strong> (Mean Dice: 0.685–0.805 across datasets).
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+                Try Prediction
+            </a>
+            <a href="{{ url_for('results') }}" class="btn btn-secondary btn-lg">
+                View Results
+            </a>
+        </div>
+    </section>
+
+    <!-- Key Metrics Highlight -->
+    <section class="section-header" style="text-align: center;">
+        <h2 class="section-title">Standardized Test Results</h2>
+        <p class="section-subtitle">Mean Dice scores across three benchmark datasets (higher is better)</p>
+    </section>
+
+    <div class="grid grid-4">
+        <div class="metric-card best">
+            <div class="metric-value">0.805</div>
+            <div class="metric-label">NC4K — RGB + Depth</div>
+            <div class="metric-delta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 15l-6-6 6-6"/>
+                </svg>
+                Best overall
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">0.745</div>
+            <div class="metric-label">CAMO — RGB + Depth</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">0.685</div>
+            <div class="metric-label">COD10K — RGB + Depth</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">4</div>
+            <div class="metric-label">Model Configurations</div>
+            <div class="metric-delta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                RGB, +Canny, +Depth, +Both
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Cards -->
+    <section style="margin-top: var(--space-3xl);">
+        <div class="section-header" style="text-align: center;">
+            <h2 class="section-title">Datasets Used</h2>
+            <p class="section-subtitle">Combined training on 10,437 images across three camouflaged object datasets</p>
+        </div>
+
+        <div class="grid grid-3">
+            <article class="dataset-card">
+                <div class="dataset-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">COD10K_CAM</h3>
+                <div class="dataset-stats">
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">5,066</span>
+                        <span>Total Images</span>
+                    </div>
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">2,026</span>
+                        <span>Test Set</span>
+                    </div>
+                </div>
+                <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--color-text-muted);">
+                    Largest COD dataset with diverse camouflaged objects in natural scenes
+                </p>
+            </article>
+
+            <article class="dataset-card">
+                <div class="dataset-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">CAMO</h3>
+                <div class="dataset-stats">
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">1,250</span>
+                        <span>Total Images</span>
+                    </div>
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">250</span>
+                        <span>Test Set</span>
+                    </div>
+                </div>
+                <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--color-text-muted);">
+                    Challenging dataset with highly camouflaged animals and objects
+                </p>
+            </article>
+
+            <article class="dataset-card">
+                <div class="dataset-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polyline points="16 18 22 12 16 6"/>
+                        <polyline points="8 18 2 12 8 6"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">NC4K</h3>
+                <div class="dataset-stats">
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">4,121</span>
+                        <span>Total Images</span>
+                    </div>
+                    <div class="dataset-stat">
+                        <span class="dataset-stat-value">413</span>
+                        <span>Test Set</span>
+                    </div>
+                </div>
+                <p style="margin-top: var(--space-md); font-size: var(--text-sm); color: var(--color-text-muted);">
+                    New camouflaged object dataset with high-quality annotations
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Best Configuration Card -->
+    <section style="margin-top: var(--space-3xl);">
+        <div class="card" style="background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-primary-muted) 100%); border-color: var(--color-primary);">
+            <div class="card-header">
+                <h2 class="card-title">🏆 Best Configuration: RGB + Depth</h2>
+                <span class="badge badge-success">Top Performer</span>
+            </div>
+            <div class="grid grid-2" style="gap: var(--space-xl);">
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Why RGB + Depth Works Best</h3>
+                    <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                        <li style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                            Depth provides geometric cues that break camouflage
+                        </li>
+                        <li style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                            Depth Anything V2 generates robust monocular depth
+                        </li>
+                        <li style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                            Consistent improvement across all three test datasets
+                        </li>
+                        <li style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                            Outperforms RGB+Canny and RGB+Canny+Depth configurations
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Key Metrics (Mean Dice)</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dataset</th>
+                                    <th>RGB</th>
+                                    <th>RGB+Depth</th>
+                                    <th>Improvement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>COD10K_CAM</td>
+                                    <td>0.638</td>
+                                    <td class="metric-best">0.685</td>
+                                    <td class="metric-best">+7.4%</td>
+                                </tr>
+                                <tr>
+                                    <td>CAMO</td>
+                                    <td>0.597</td>
+                                    <td class="metric-best">0.745</td>
+                                    <td class="metric-best">+24.7%</td>
+                                </tr>
+                                <tr>
+                                    <td>NC4K</td>
+                                    <td>0.755</td>
+                                    <td class="metric-best">0.805</td>
+                                    <td class="metric-best">+6.6%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-lg); text-align: center;">
+                <a href="{{ url_for('results') }}" class="btn btn-primary">
+                    View Full Comparison →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Navigation -->
+    <section style="margin-top: var(--space-3xl);">
+        <div class="section-header" style="text-align: center;">
+            <h2 class="section-title">Explore the Project</h2>
+        </div>
+        <div class="grid grid-3">
+            <a href="{{ url_for('predict') }}" class="card" style="text-decoration: none; text-align: center;">
+                <div class="dataset-icon" style="margin-bottom: var(--space-md);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">Upload & Predict</h3>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm);">Test the model on your own images</p>
+            </a>
+            <a href="{{ url_for('results') }}" class="card" style="text-decoration: none; text-align: center;">
+                <div class="dataset-icon" style="margin-bottom: var(--space-md);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">Results & Comparison</h3>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm);">Detailed metrics, charts, and analysis</p>
+            </a>
+            <a href="{{ url_for('about') }}" class="card" style="text-decoration: none; text-align: center;">
+                <div class="dataset-icon" style="margin-bottom: var(--space-md);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                </div>
+                <h3 class="dataset-name">Methodology</h3>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm);">Model architecture, training, and approach</p>
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}About - Camouflaged Object Segmentation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h1 class="section-title">About & Methodology</h1>
+        <p class="section-subtitle">
+            Technical details about the camouflaged object segmentation approach, model architecture, datasets, and training.
+        </p>
+    </div>
+
+    <!-- Problem Statement -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Problem: Camouflaged Object Segmentation</h2>
+        </div>
+        <p style="color: var(--color-text-muted); margin-bottom: var(--space-md);">
+            Camouflaged object segmentation (COS) aims to identify objects that blend seamlessly into their surroundings.
+            Unlike traditional salient object detection where objects stand out, camouflaged objects share similar texture,
+            color, and intensity patterns with the background, making them extremely challenging to detect.
+        </p>
+        <div class="grid grid-2" style="gap: var(--space-md); margin-top: var(--space-md);">
+            <div style="padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md);">
+                <strong>Standard Segmentation</strong>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-xs);">
+                    Clear boundary between object and background
+                </p>
+            </div>
+            <div style="padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md);">
+                <strong>Camouflaged Segmentation</strong>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-xs);">
+                    Object mimics background texture, color, and intensity
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Model Architecture -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Model Architecture: U-Net with ResNet34 Encoder</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl); align-items: start;">
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Architecture Details</h3>
+                <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                    <li><strong>Encoder:</strong> ResNet34 pre-trained on ImageNet</li>
+                    <li><strong>Decoder:</strong> U-Net upsampling with skip connections</li>
+                    <li><strong>Output:</strong> Single-channel binary mask (logits)</li>
+                    <li><strong>Activation:</strong> Sigmoid applied at inference (threshold 0.5)</li>
+                    <li><strong>Loss:</strong> BCE + Dice Loss combination</li>
+                    <li><strong>Optimizer:</strong> Adam (lr=1e-4 for RGB, 1e-5 for others)</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Four Input Configurations</h3>
+                <div style="display: grid; gap: var(--space-sm);">
+                    <div class="model-config config-rgb" style="justify-content: space-between;">
+                        <span>RGB (3 channels)</span>
+                        <span style="color: var(--color-text-muted);">Baseline</span>
+                    </div>
+                    <div class="model-config config-canny" style="justify-content: space-between;">
+                        <span>RGB + Canny (4 channels)</span>
+                        <span style="color: var(--color-text-muted);">Edge cues</span>
+                    </div>
+                    <div class="model-config config-depth" style="justify-content: space-between;">
+                        <span>RGB + Depth (4 channels)</span>
+                        <span class="badge badge-success" style="font-size: 10px;">Best</span>
+                    </div>
+                    <div class="model-config config-combined" style="justify-content: space-between;">
+                        <span>RGB + Canny + Depth (5 channels)</span>
+                        <span style="color: var(--color-text-muted);">All features</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depth Anything V2 -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Depth Estimation: Depth Anything V2</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl);">
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Why Depth Helps</h3>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--space-md);">
+                    Camouflage works by matching appearance (color/texture) but rarely matches 3D geometry.
+                    Depth provides geometric cues that break the camouflage illusion.
+                </p>
+                <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                    <li>• Monocular depth estimation — no stereo required</li>
+                    <li>• Pre-trained on massive diverse dataset (62M+ images)</li>
+                    <li>• Robust generalization to unseen scenes</li>
+                    <li>• Normalized to [0, 1] per image for consistent input</li>
+                    <li>• Cached as .npy files for training efficiency</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Integration Pipeline</h3>
+                <ol style="display: grid; gap: var(--space-sm); color: var(--color-text-muted); padding-left: var(--space-lg);">
+                    <li>Input RGB image (352×352)</li>
+                    <li>Depth Anything V2 → depth map (H×W)</li>
+                    <li>Normalize depth to [0, 1] per image</li>
+                    <li>Concatenate as 4th channel: [R, G, B, Depth]</li>
+                    <li>Feed to 4-channel U-Net</li>
+                </ol>
+                <p style="color: var(--color-warning); font-size: var(--text-sm); margin-top: var(--space-md);">
+                    ⚠ For website uploads: depth must be generated on-the-fly using the same Depth Anything V2 model.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Datasets -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Datasets</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>Train</th>
+                        <th>Val</th>
+                        <th>Test</th>
+                        <th>Total</th>
+                        <th>Characteristics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>COD10K_CAM</strong></td>
+                        <td>2,736</td>
+                        <td>304</td>
+                        <td>2,026</td>
+                        <td>5,066</td>
+                        <td>Largest, diverse natural scenes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CAMO</strong></td>
+                        <td>800</td>
+                        <td>200</td>
+                        <td>250</td>
+                        <td>1,250</td>
+                        <td>Highly challenging, animals/objects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NC4K</strong></td>
+                        <td>3,296</td>
+                        <td>412</td>
+                        <td>413</td>
+                        <td>4,121</td>
+                        <td>High-quality annotations</td>
+                    </tr>
+                    <tr style="background: var(--color-bg-elevated); font-weight: var(--font-semibold);">
+                        <td><strong>Combined</strong></td>
+                        <td>6,832</td>
+                        <td>916</td>
+                        <td>2,689</td>
+                        <td>10,437</td>
+                        <td>All datasets merged</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: var(--space-lg);">
+            <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Preprocessing</h3>
+            <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                <li>• Resize all images and masks to 352×352</li>
+                <li>• RGB normalization: ImageNet mean/std ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])</li>
+                <li>• Masks: nearest-neighbor resize → binary 0/1</li>
+                <li>• Depth maps: per-image min-max normalization to [0, 1]</li>
+                <li>• Canny edges: cv2.Canny(gray, 100, 200) → normalized to [0, 1]</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Training Details -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Training Configuration</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl);">
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Hyperparameters</h3>
+                <div style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Batch Size</span>
+                        <strong>4</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Epochs</span>
+                        <strong>20</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Learning Rate (RGB)</span>
+                        <strong>1e-4</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Learning Rate (Others)</span>
+                        <strong>1e-5</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Optimizer</span>
+                        <strong>Adam</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Loss</span>
+                        <strong>BCE + Dice</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Workers</span>
+                        <strong>0 (Windows)</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm);">
+                        <span>Device</span>
+                        <strong>CUDA (RTX 4060)</strong>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Best Checkpoints</h3>
+                <div style="display: grid; gap: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+                        <span>RGB</span>
+                        <code style="font-size: var(--text-xs);">unet_resnet34_all_datasets_best.pth</code>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+                        <span>RGB + Canny</span>
+                        <code style="font-size: var(--text-xs);">unet_resnet34_canny_extended_best.pth</code>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-primary-muted); border-radius: var(--radius-sm); border: 1px solid var(--color-primary);">
+                        <span>RGB + Depth <span class="badge badge-success" style="font-size: 10px; margin-left: 4px;">Best</span></span>
+                        <code style="font-size: var(--text-xs);">unet_resnet34_depth_best.pth</code>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: var(--space-sm); background: var(--color-bg); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+                        <span>RGB + Canny + Depth</span>
+                        <code style="font-size: var(--text-xs);">unet_resnet34_rgb_canny_depth_best.pth</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evaluation Metrics -->
+    <section class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Evaluation Metrics</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl);">
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Dice Coefficient (F1)</h3>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--space-md);">
+                    Measures overlap between prediction and ground truth. Range: 0–1 (higher is better).
+                </p>
+                <pre style="background: var(--color-bg); padding: var(--space-md); border-radius: var(--radius-md); font-size: var(--text-sm); overflow-x: auto;"><code>Dice = 2 × |P ∩ G| / (|P| + |G|)</code></pre>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: var(--space-sm);">
+                    <strong>Mean Dice:</strong> Average per-image Dice<br>
+                    <strong>Global Dice:</strong> Aggregate pixels across dataset first
+                </p>
+            </div>
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md);">Intersection over Union (IoU)</h3>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--space-md);">
+                    Jaccard index — overlap over union. Range: 0–1 (higher is better).
+                </p>
+                <pre style="background: var(--color-bg); padding: var(--space-md); border-radius: var(--radius-md); font-size: var(--text-sm); overflow-x: auto;"><code>IoU = |P ∩ G| / |P ∪ G|</code></pre>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: var(--space-sm);">
+                    <strong>Mean IoU:</strong> Average per-image IoU<br>
+                    <strong>Global IoU:</strong> Aggregate pixels across dataset first
+                </p>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md); border-left: 3px solid var(--color-primary);">
+            <strong>Threshold:</strong> Model outputs logits → sigmoid → threshold at 0.5 for binary mask
+        </div>
+    </section>
+
+    <!-- Limitations -->
+    <section class="card" style="border-color: var(--color-warning);">
+        <div class="card-header">
+            <h2 class="card-title">Limitations & Future Work</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl);">
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-warning);">Current Limitations</h3>
+                <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                    <li>• Fixed 352×352 input resolution</li>
+                    <li>• No test-time augmentation</li>
+                    <li>• Single threshold (0.5) for all datasets</li>
+                    <li>• Depth generated offline for training (not end-to-end)</li>
+                    <li>• Canny thresholds fixed (100, 200) — not learned</li>
+                    <li>• Combined model doesn't outperform depth-only</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-primary);">Future Improvements</h3>
+                <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                    <li>• Multi-scale training & inference</li>
+                    <li>• Learnable edge/depth fusion modules</li>
+                    <li>• End-to-end depth estimation fine-tuning</li>
+                    <li>• Transformer-based decoders (Swin, MiT)</li>
+                    <li>• Boundary-aware losses</li>
+                    <li>• Video camouflaged object segmentation</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- References -->
+    <section class="card">
+        <div class="card-header">
+            <h2 class="card-title">References</h2>
+        </div>
+        <div style="display: grid; gap: var(--space-sm); color: var(--color-text-muted); font-size: var(--text-sm);">
+            <p>• Ronneberger et al., "U-Net: Convolutional Networks for Biomedical Image Segmentation" (2015)</p>
+            <p>• He et al., "Deep Residual Learning for Image Recognition" (2016)</p>
+            <p>• Yang et al., "Depth Anything V2" (2024)</p>
+            <p>• Fan et al., "COD10K: A Large-Scale Camouflaged Object Detection Dataset" (2020)</p>
+            <p>• Le et al., "CAMO: Camouflaged Object Dataset" (2019)</p>
+            <p>• Lv et al., "NC4K: A New Camouflaged Object Dataset" (2021)</p>
+            <p>• segmentation_models_pytorch library by Pavel Yakubovskiy</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

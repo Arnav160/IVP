@@ -1,0 +1,29 @@
+
+# Datasets and generated depth maps
+datasets/
+depth_maps/
+
+# Trained model checkpoints
+checkpoints/
+
+# Python virtual environments and cache
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Secrets and local environment settings
+.env
+.env.*
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+pytorch/
+
+models/svm/svm_data/

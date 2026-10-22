@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Predict - Camouflaged Object Segmentation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h1 class="section-title">Upload & Predict</h1>
+        <p class="section-subtitle">
+            Upload an image to segment camouflaged objects. The model uses RGB + Depth (Depth Anything V2) for best results.
+        </p>
+    </div>
+
+    <!-- Model Selection -->
+    <div class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Model Configuration</h2>
+        </div>
+        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap; align-items: center;">
+            <span class="model-config config-rgb">RGB</span>
+            <span class="model-config config-canny">+Canny</span>
+            <span class="model-config config-depth">+Depth <span class="badge badge-success" style="font-size: 10px; margin-left: 4px;">Best</span></span>
+            <span class="model-config config-combined">+Canny+Depth</span>
+            <div style="margin-left: auto; font-size: var(--text-sm); color: var(--color-text-muted);">
+                Current: <strong>RGB + Depth</strong> (auto depth generation)
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Area -->
+    <div class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Upload Image</h2>
+        </div>
+        <div id="upload-area" class="upload-area" tabindex="0" role="button" aria-label="Upload image">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p class="upload-text">Drag & drop an image here, or click to browse</p>
+            <p class="upload-hint">Supports PNG, JPG, WebP • Max 10MB</p>
+            <input type="file" id="file-input" class="file-input" accept="image/png,image/jpeg,image/webp">
+        </div>
+    </div>
+
+    <!-- Preview & Results -->
+    <div id="preview-container" class="preview-container" style="display: none;"></div>
+
+    <!-- Info Section -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">How It Works</h2>
+        </div>
+        <div class="grid grid-3" style="gap: var(--space-md);">
+            <div style="text-align: center; padding: var(--space-md);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-primary-muted); color: var(--color-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-sm); font-size: var(--text-xl);">1</div>
+                <h4 style="font-size: var(--text-base); margin-bottom: var(--space-xs);">Upload Image</h4>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">Select a photo with potential camouflaged objects</p>
+            </div>
+            <div style="text-align: center; padding: var(--space-md);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-primary-muted); color: var(--color-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-sm); font-size: var(--text-xl);">2</div>
+                <h4 style="font-size: var(--text-base); margin-bottom: var(--space-xs);">Depth Estimation</h4>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">Depth Anything V2 generates depth map automatically</p>
+            </div>
+            <div style="text-align: center; padding: var(--space-md);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-primary-muted); color: var(--color-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-sm); font-size: var(--text-xl);">3</div>
+                <h4 style="font-size: var(--text-base); margin-bottom: var(--space-xs);">Segmentation</h4>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">U-Net + ResNet34 predicts binary camouflage mask</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

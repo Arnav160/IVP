@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Camouflaged Object Segmentation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h1 class="section-title">Model Comparison Results</h1>
+        <p class="section-subtitle">
+            Standardized evaluation across three test datasets. All models use U-Net with ResNet34 encoder, trained on combined datasets.
+        </p>
+    </div>
+
+    <!-- Metric Definitions -->
+    <div class="card" style="margin-bottom: var(--space-xl);">
+        <div class="card-header">
+            <h2 class="card-title">Metric Definitions</h2>
+        </div>
+        <div class="grid grid-2" style="gap: var(--space-md);">
+            <div>
+                <strong>Mean Dice / IoU</strong>: Calculated per image, then averaged. Sensitive to performance on individual images.
+            </div>
+            <div>
+                <strong>Global Dice / IoU</strong>: Aggregates pixel intersections and mask counts across dataset before computing. Weights larger objects more.
+            </div>
+        </div>
+    </div>
+
+    <!-- COD10K_CAM Results -->
+    <section style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--text-xl); font-weight: var(--font-semibold); margin-bottom: var(--space-lg); color: var(--color-primary);">COD10K_CAM — 2,026 test images</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Mean Dice</th>
+                        <th>Mean IoU</th>
+                        <th>Global Dice</th>
+                        <th>Global IoU</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="model-config config-rgb">RGB</span></td>
+                        <td>0.6382</td>
+                        <td>0.5248</td>
+                        <td>0.7273</td>
+                        <td>0.5715</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-canny">RGB + Canny</span></td>
+                        <td>0.6240</td>
+                        <td>0.5047</td>
+                        <td>0.7197</td>
+                        <td>0.5621</td>
+                    </tr>
+                    <tr style="background: var(--color-primary-muted); border-left: 3px solid var(--color-primary);">
+                        <td><span class="model-config config-depth">RGB + Depth</span></td>
+                        <td class="metric-best">0.6852</td>
+                        <td class="metric-best">0.5787</td>
+                        <td class="metric-best">0.7854</td>
+                        <td class="metric-best">0.6467</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-combined">RGB + Canny + Depth</span></td>
+                        <td>0.6572</td>
+                        <td>0.5490</td>
+                        <td>0.7688</td>
+                        <td>0.6244</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- CAMO Results -->
+    <section style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--text-xl); font-weight: var(--font-semibold); margin-bottom: var(--space-lg); color: var(--color-primary);">CAMO — 250 test images</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Mean Dice</th>
+                        <th>Mean IoU</th>
+                        <th>Global Dice</th>
+                        <th>Global IoU</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="model-config config-rgb">RGB</span></td>
+                        <td>0.5974</td>
+                        <td>0.4852</td>
+                        <td>0.6387</td>
+                        <td>0.4691</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-canny">RGB + Canny</span></td>
+                        <td>0.6411</td>
+                        <td>0.5244</td>
+                        <td>0.6816</td>
+                        <td>0.5170</td>
+                    </tr>
+                    <tr style="background: var(--color-primary-muted); border-left: 3px solid var(--color-primary);">
+                        <td><span class="model-config config-depth">RGB + Depth</span></td>
+                        <td class="metric-best">0.7448</td>
+                        <td class="metric-best">0.6448</td>
+                        <td class="metric-best">0.7847</td>
+                        <td class="metric-best">0.6457</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-combined">RGB + Canny + Depth</span></td>
+                        <td>0.7231</td>
+                        <td>0.6225</td>
+                        <td>0.7773</td>
+                        <td>0.6357</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- NC4K Results -->
+    <section style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--text-xl); font-weight: var(--font-semibold); margin-bottom: var(--space-lg); color: var(--color-primary);">NC4K — 413 test images</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Mean Dice</th>
+                        <th>Mean IoU</th>
+                        <th>Global Dice</th>
+                        <th>Global IoU</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="model-config config-rgb">RGB</span></td>
+                        <td>0.7552</td>
+                        <td>0.6506</td>
+                        <td>0.8051</td>
+                        <td>0.6738</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-canny">RGB + Canny</span></td>
+                        <td>0.7540</td>
+                        <td>0.6475</td>
+                        <td>0.8128</td>
+                        <td>0.6847</td>
+                    </tr>
+                    <tr style="background: var(--color-primary-muted); border-left: 3px solid var(--color-primary);">
+                        <td><span class="model-config config-depth">RGB + Depth</span></td>
+                        <td class="metric-best">0.8053</td>
+                        <td class="metric-best">0.7116</td>
+                        <td class="metric-best">0.8558</td>
+                        <td class="metric-best">0.7479</td>
+                    </tr>
+                    <tr>
+                        <td><span class="model-config config-combined">RGB + Canny + Depth</span></td>
+                        <td>0.7749</td>
+                        <td>0.6784</td>
+                        <td>0.8407</td>
+                        <td>0.7252</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Summary Charts (Placeholder for Chart.js) -->
+    <section style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--text-xl); font-weight: var(--font-semibold); margin-bottom: var(--space-lg);">Mean Dice Comparison</h2>
+        <div class="chart-container">
+            <h3 class="chart-title">Mean Dice Across Datasets</h3>
+            <div class="chart-wrapper" id="mean-dice-chart">
+                <canvas id="meanDiceCanvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--text-xl); font-weight: var(--font-semibold); margin-bottom: var(--space-lg);">Mean IoU Comparison</h2>
+        <div class="chart-container">
+            <h3 class="chart-title">Mean IoU Across Datasets</h3>
+            <div class="chart-wrapper" id="mean-iou-chart">
+                <canvas id="meanIouCanvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Findings -->
+    <section>
+        <div class="card" style="background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-primary-muted) 100%); border-color: var(--color-primary);">
+            <div class="card-header">
+                <h2 class="card-title">Key Findings</h2>
+            </div>
+            <div class="grid grid-2" style="gap: var(--space-xl);">
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-success);">✅ RGB + Depth Wins Overall</h3>
+                    <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                        <li>• Highest Mean Dice on all three datasets</li>
+                        <li>• Highest Global Dice on all three datasets</li>
+                        <li>• Largest improvement on CAMO (+24.7% over RGB)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-warning);">⚠️ Canny Edge Results Mixed</h3>
+                    <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                        <li>• Helps on CAMO (0.641 vs 0.597 Mean Dice)</li>
+                        <li>• Slightly hurts on COD10K (0.624 vs 0.638)</li>
+                        <li>• Negligible effect on NC4K (0.754 vs 0.755)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-accent);">🔍 Combined Not Better Than Depth Alone</h3>
+                    <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                        <li>• RGB+Canny+Depth < RGB+Depth on all metrics</li>
+                        <li>• Extra channel may add noise without benefit</li>
+                        <li>• Depth provides sufficient geometric cues</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-md); color: var(--color-primary);">📊 Global vs Mean Metrics</h3>
+                    <ul style="display: grid; gap: var(--space-sm); color: var(--color-text-muted);">
+                        <li>• Global metrics consistently higher</li>
+                        <li>• Larger objects dominate global scores</li>
+                        <li>• Mean metrics better reflect per-image quality</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Mean Dice Chart
+    const diceCtx = document.getElementById('meanDiceCanvas');
+    if (diceCtx) {
+        new Chart(diceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['COD10K_CAM', 'CAMO', 'NC4K'],
+                datasets: [
+                    {
+                        label: 'RGB',
+                        data: [0.6382, 0.5974, 0.7552],
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'RGB + Canny',
+                        data: [0.6240, 0.6411, 0.7540],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        borderColor: 'rgb(245, 158, 11)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'RGB + Depth',
+                        data: [0.6852, 0.7448, 0.8053],
+                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                        borderColor: 'rgb(34, 197, 94)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'RGB + Canny + Depth',
+                        data: [0.6572, 0.7231, 0.7749],
+                        backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                        borderColor: 'rgb(168, 85, 247)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#e8eaed', usePointStyle: true } },
+                    title: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        grid: { color: 'rgba(58, 65, 75, 0.5)' },
+                        ticks: { color: '#9aa4b2', callback: v => v.toFixed(1) }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9aa4b2' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Mean IoU Chart
+    const iouCtx = document.getElementById('meanIouCanvas');
+    if (iouCtx) {
+        new Chart(iouCtx, {
+            type: 'bar',
+            data: {
+                labels: ['COD10K_CAM', 'CAMO', 'NC4K'],
+                datasets: [
+                    {
+                        label: 'RGB',
+                        data: [0.5248, 0.4852, 0.6506],
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'RGB + Canny',
+                        data: [0.5047, 0.5244, 0.6475],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        borderColor: 'rgb(245, 158, 11)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'RGB + Depth',
+                        data: [0.5787, 0.6448, 0.7116],
+                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                        borderColor: 'rgb(34, 197, 94)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'RGB + Canny + Depth',
+                        data: [0.5490, 0.6225, 0.6784],
+                        backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                        borderColor: 'rgb(168, 85, 247)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#e8eaed', usePointStyle: true } },
+                    title: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        grid: { color: 'rgba(58, 65, 75, 0.5)' },
+                        ticks: { color: '#9aa4b2', callback: v => v.toFixed(1) }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9aa4b2' }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
